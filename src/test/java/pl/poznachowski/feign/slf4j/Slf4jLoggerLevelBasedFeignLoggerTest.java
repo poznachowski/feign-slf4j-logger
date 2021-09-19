@@ -45,12 +45,12 @@ class Slf4jLoggerLevelBasedFeignLoggerTest {
                     .body("body", StandardCharsets.UTF_8)
                     .build();
 
-    private final Slf4jLoggerLevelBasedFeignLogger logger = new Slf4jLoggerLevelBasedFeignLogger(
+    private final MethodsExposedFeignLogger logger = new MethodsExposedFeignLogger(
             Slf4jLoggerLevelBasedFeignLogger.class);
 
     @Test
     void should_have_proper_log_levels_on_logging_request() {
-        logger.logRequest(CONFIG_KEY, Logger.Level.BASIC, REQUEST);
+        logger.logRequest(CONFIG_KEY, Logger.Level.FULL, REQUEST);
         assertThat(testLogger.getLoggingEvents())
                 .extracting(LoggingEvent::getLevel, LoggingEvent::getMessage)
                 .contains(
@@ -62,7 +62,7 @@ class Slf4jLoggerLevelBasedFeignLoggerTest {
 
     @Test
     void should_have_proper_log_levels_on_logging_retry() {
-        logger.logRetry(CONFIG_KEY, Logger.Level.BASIC);
+        logger.logRetry(CONFIG_KEY, Logger.Level.FULL);
         assertThat(testLogger.getLoggingEvents())
                 .extracting(LoggingEvent::getLevel, LoggingEvent::getMessage)
                 .contains(tuple(Level.INFO, "[someMethod] ---> RETRYING"));
@@ -70,7 +70,7 @@ class Slf4jLoggerLevelBasedFeignLoggerTest {
 
     @Test
     void should_have_proper_log_levels_on_logging_exception() {
-        logger.logIOException(CONFIG_KEY, Logger.Level.BASIC, new IOException("ex"), 1000L);
+        logger.logIOException(CONFIG_KEY, Logger.Level.FULL, new IOException("ex"), 1000L);
         assertThat(testLogger.getLoggingEvents())
                 .extracting(LoggingEvent::getLevel, LoggingEvent::getMessage)
                 .contains(tuple(Level.ERROR, "[someMethod] <--- ERROR IOException: ex (1000ms)"));
@@ -78,7 +78,7 @@ class Slf4jLoggerLevelBasedFeignLoggerTest {
 
     @Test
     void should_have_proper_log_levels_on_logging_response() throws IOException {
-        logger.logAndRebufferResponse(CONFIG_KEY, Logger.Level.BASIC, RESPONSE, 1000L);
+        logger.logAndRebufferResponse(CONFIG_KEY, Logger.Level.FULL, RESPONSE, 1000L);
         assertThat(testLogger.getLoggingEvents())
                 .extracting(LoggingEvent::getLevel, LoggingEvent::getMessage)
                 .contains(
